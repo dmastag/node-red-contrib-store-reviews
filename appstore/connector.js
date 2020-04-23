@@ -8,30 +8,21 @@ function getReviews(appId, country, page) {
   var deferred = Q.defer();
 
   var url = 'http://itunes.apple.com/rss/customerreviews/page=' + page + '/id=' + appId + '/sortby=mostrecent/json?cc=' + country;
-  console.log('The URL is ' + url);
 
 	request(url, function (error, response, body) {
 
 		if (!error && response.statusCode == 200) {
 
       var data = JSON.parse(body);
-      console.log('data ' + data);
-
-      var entry = data.feed.entry;
-      console.log('entry ' + entry);
-      var links = data.feed.link;
-      console.log('links ' + links);
+			var entry = data.feed.entry;
+			var links = data.feed.link;
 
 			if (entry && links) {
 
         var reviews = [];
         entry.forEach(function(e) {
-          console.log('e ' + e);
           if ('content' in e) {
-              console.log('has content ');
-
               reviews.push(formatReview(e));
-              console.log(reviews);
           }
         });
 
