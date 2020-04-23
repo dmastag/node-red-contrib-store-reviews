@@ -4,9 +4,7 @@ var storeScraper = require('google-play-scraper');
 var url = require('url');
 
 function getReviews(appId, country, page) {
-  console.log("appId", appId)
-  console.log("country", country)
-  console.log("page", page)
+
   var deferred = Q.defer();
   storeScraper.reviews({
     appId: appId,
@@ -15,7 +13,6 @@ function getReviews(appId, country, page) {
     sort: storeScraper.sort.NEWEST
   }).then(function(reviews) {
     var formattedReviews = [];
-    console.log("reviews", reviews)
 
     reviews.forEach(function(r) {
       formattedReviews.push(formatReview(r));
@@ -31,10 +28,9 @@ function getReviews(appId, country, page) {
 }
 
 function getAppInfo(appId) {
-  console.log('getAppInfo called', appId)
+
   var deferred = Q.defer();
   storeScraper.app({appId: appId}).then(function(app) {
-    console.log('app', app)
     deferred.resolve(formatAppInfo(app));
   }).catch(function(err) {
     deferred.reject(new Error(err));
@@ -58,7 +54,6 @@ function formatReview(rawReview) {
 }
 
 function formatAppInfo(rawAppInfo) {
-  console.log('rawAppInfo',rawAppInfo)
   return {
     id: rawAppInfo.appId,
     title: rawAppInfo.title,

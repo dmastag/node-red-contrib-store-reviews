@@ -10,7 +10,6 @@ module.exports = function(RED) {
       RED.nodes.createNode(this,config);
 
       // Parse multiple app ids
-      console.log(config)
       this.appids = config.appid.split(' ');
       this.language = config.language;
       this.pollinginterval = config.pollinginterval;
