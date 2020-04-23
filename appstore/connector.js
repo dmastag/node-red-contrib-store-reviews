@@ -29,7 +29,9 @@ function getReviews(appId, country, page) {
           console.log('e ' + e);
           if ('content' in e) {
               console.log('has content ');
+
               reviews.push(formatReview(e));
+              console.log(reviews);
           }
         });
 
