@@ -15,8 +15,12 @@ function getReviews(appId, country, page) {
 		if (!error && response.statusCode == 200) {
 
       var data = JSON.parse(body);
-			var entry = data.feed.entry;
-			var links = data.feed.link;
+      console.log('data ' + data);
+
+      var entry = data.feed.entry;
+      console.log('entry ' + entry);
+      var links = data.feed.link;
+      console.log('links ' + links);
 
 			if (entry && links) {
 
