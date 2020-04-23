@@ -26,7 +26,9 @@ function getReviews(appId, country, page) {
 
         var reviews = [];
         entry.forEach(function(e) {
+          console.log('e ' + e);
           if ('content' in e) {
+              console.log('has content ');
               reviews.push(formatReview(e));
           }
         });
