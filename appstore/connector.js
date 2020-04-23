@@ -8,7 +8,8 @@ function getReviews(appId, country, page) {
   var deferred = Q.defer();
 
   var url = 'http://itunes.apple.com/rss/customerreviews/page=' + page + '/id=' + appId + '/sortby=mostrecent/json?cc=' + country;
-
+  node.log('The URL is ' + url);
+  
 	request(url, function (error, response, body) {
 
 		if (!error && response.statusCode == 200) {
