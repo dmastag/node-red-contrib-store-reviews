@@ -4,7 +4,9 @@ var storeScraper = require('google-play-scraper');
 var url = require('url');
 
 function getReviews(appId, country, page) {
-
+  console.log("appId", appId)
+  console.log("country", country)
+  console.log("page", page)
   var deferred = Q.defer();
   storeScraper.reviews({
     appId: appId,
@@ -13,6 +15,7 @@ function getReviews(appId, country, page) {
     sort: storeScraper.sort.NEWEST
   }).then(function(reviews) {
     var formattedReviews = [];
+    console.log("reviews", reviews)
 
     reviews.forEach(function(r) {
       formattedReviews.push(formatReview(r));
