@@ -16,7 +16,7 @@ module.exports = (RED) => {
     this.country = config.country;
     this.pollinginterval = config.pollinginterval;
 
-    const context = this.context();
+    const context = this.context().flow;
     const node = this;
 
     // Instantiate detector for each application
