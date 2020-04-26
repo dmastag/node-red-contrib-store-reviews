@@ -25,8 +25,9 @@
   "repository": "zippy1978/node-red-contrib-store-reviews",
   "license": "ISC",
   "dependencies": {
-    "app-store-scraper": "^0.3.1",
+    "app-store-scraper": "0.16.2",
     "google-play-scraper": "7.1.2",
+    "node-fetch": "2.6.0",
     "q": "^1.4.1",
     "request": "^2.74.0"
   },

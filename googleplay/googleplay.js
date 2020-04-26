@@ -1,65 +1,79 @@
-module.exports = function(RED) {
+module.exports = function (RED) {
   "use strict";
 
-  var poller = require('../lib/poller.js');
-  var Detector = require('../lib/detector.js');
-  var connector = require('./connector.js');
+  const poller = require('../lib/poller.js');
+  const detector = require('../lib/detector.js');
+  const connector = require('./connector.js');
 
   function GooglePlayNode(config) {
 
-      RED.nodes.createNode(this,config);
+    RED.nodes.createNode(this, config);
 
-      // Parse multiple app ids
-      this.appids = config.appid.split(' ');
-      this.language = config.language;
-      this.pollinginterval = config.pollinginterval;
-      var context = this.context();
-      var node = this;
+    // Parse multiple app ids
+    this.appids = config.appid.split(' ');
+    this.language = config.language;
+    this.pollinginterval = config.pollinginterval;
 
-      // Instantiate detector for each application
-      node.appids.forEach(function(a) {
-        node.log('Registering app ' + a);
-        context.set(a, new Detector(a, node.language, connector));
-      });
 
-      // Start polling
-      poller.start(function() {
+    const context = this.context();
+    const node = this;
 
-        // Detect new reviews for each application
-        node.appids.forEach(function(a) {
-          var detector = context.get(a);
+    // Instantiate detector for each application
+    node.appids.forEach(app => {
+      node.log('Registering app ' + app);
+    });
 
-          node.log('Looking for new reviews for app ' + a);
+    // Start polling
+    poller.start(() => {
+      // Detect new reviews for each application
+      node.appids.forEach(async app => {
+        let appContext = context.get(app);
 
-          detector.detect()
-          .then(function(newReviews) {
-
-            node.log(newReviews.length + ' new reviews found for app ' + detector.appId);
-
-            // Send new reviews
-            newReviews.forEach(function(r) {
-              var msg = {payload: r.id + ' - ' + r.title + ' - ' + r.rating};
-              msg.review = r;
-              node.send(msg);
-            });
-
-          }).fail(function(err) {
-            console.log(err.message);
-            node.error('Failed to detect new reviews for ' + a);
-          });
-        });
-
-      }, parseInt(node.pollinginterval));
-
-      // On node destruction...
-      node.on('close', function(done) {
-        if (interval !== null) {
-         poller.stop();
+        if (!appContext) {
+          appContext = {
+            "appId": app,
+            "language": node.language,
+            "appInfo": null,
+            "latestReviewId": null
+          }
+          context.set(app, appContext)
         }
-        done();
+
+        node.log(`Looking for new reviews for app ${app} with last review ID ${appContext.latestReviewId}`);
+
+        try {
+
+          const returnDetector = await detector.detect(app, node.language, connector, appContext.latestReviewId);
+          node.log(`${returnDetector.newReviews.length} new reviews found for app ${app} and last review ID ${returnDetector.latestReviewId}`);
+
+          // Send new reviews
+          returnDetector.newReviews.forEach((review) => {
+            var msg = { payload: `${review.id}  - ${review.title} - ${review.rating}` };
+            msg.review = review;
+            node.send(msg);
+          });
+
+          appContext.latestReviewId = returnDetector.latestReviewId;
+          appContext.appInfo = returnDetector.appInfo.title;
+          context.set(app, appContext)
+
+        } catch (error) {
+          node.error('Failed to detect new reviews for ' + app);
+        }
+
       });
+
+    }, parseInt(node.pollinginterval));
+
+    // On node destruction...
+    node.on('close', function (done) {
+      if (interval !== null) {
+        poller.stop();
+      }
+      done();
+    });
 
   }
 
-  RED.nodes.registerType("googleplay",GooglePlayNode);
+  RED.nodes.registerType("googleplay", GooglePlayNode);
 };

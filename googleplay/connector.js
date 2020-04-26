@@ -1,49 +1,42 @@
 "user strict";
-var Q = require('q');
-var storeScraper = require('google-play-scraper');
-var url = require('url');
+const storeScraper = require('google-play-scraper');
+const url = require('url');
 
-function getReviews(appId, country, page) {
+const getReviews = async (appId, country, page = 1) => {
 
-  var deferred = Q.defer();
-  storeScraper.reviews({
-    appId: appId,
-    lang: country,
-    page: page,
-    sort: storeScraper.sort.NEWEST
-  }).then(function(reviews) {
-    var formattedReviews = [];
+  try {
+    const reviews = await storeScraper.reviews({
+      appId: appId,
+      lang: country,
+      page: page,
+      sort: storeScraper.sort.NEWEST
+    })
 
-    reviews.forEach(function(r) {
-      formattedReviews.push(formatReview(r));
+    let formattedReviews = []
+    reviews.forEach(review => {
+      formattedReviews.push(formatReview(review));
     });
 
-    deferred.resolve(formattedReviews);
+    return formattedReviews
 
-  }).catch(function(err) {
-    deferred.reject(new Error(err));
-  });
-
-  return deferred.promise;
-}
-
-function getAppInfo(appId) {
-
-  var deferred = Q.defer();
-  storeScraper.app({appId: appId}).then(function(app) {
-    deferred.resolve(formatAppInfo(app));
-  }).catch(function(err) {
-    deferred.reject(new Error(err));
-  });
-
-  return deferred.promise;
+  } catch (error) {
+    console.log(error)
+    return new Error('HTTP response error'); // + response.statusCode
+  }
 
 }
 
-function formatReview(rawReview) {
+const getAppInfo = async appId => {
+  try {
+    const app = await storeScraper.app({ appId: appId })
+    return formatAppInfo(app)
+  } catch (error) {
+    return new Error(error)
+  }
+}
 
-  var id = url.parse(rawReview.url, true).query.reviewId;
-
+const formatReview = rawReview => {
+  const id = url.parse(rawReview.url, true).query.reviewId;
   return {
     id: id,
     author: rawReview.userName,
@@ -53,7 +46,7 @@ function formatReview(rawReview) {
   };
 }
 
-function formatAppInfo(rawAppInfo) {
+const formatAppInfo = rawAppInfo => {
   return {
     id: rawAppInfo.appId,
     title: rawAppInfo.title,
@@ -63,12 +56,6 @@ function formatAppInfo(rawAppInfo) {
 }
 
 module.exports = {
-
-  getReviews: function(appId, country) {
-    return getReviews(appId, country, 0);
-  },
-
-  getAppInfo: function(appId) {
-    return getAppInfo(appId);
-  }
+  getReviews: getReviews,
+  getAppInfo: getAppInfo
 };

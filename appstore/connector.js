@@ -1,64 +1,49 @@
 "user strict";
-var Q = require('q');
-var request = require('request');
-var storeScraper = require('app-store-scraper');
+const fetch = require('node-fetch');
+const storeScraper = require('app-store-scraper');
 
-function getReviews(appId, country, page) {
-
-  var deferred = Q.defer();
+const getReviews = async (appId, country, page = 1) => {
 
   var url = 'http://itunes.apple.com/rss/customerreviews/page=' + page + '/id=' + appId + '/sortby=mostrecent/json?cc=' + country;
 
-	request(url, function (error, response, body) {
+  try {
+    const res = await fetch(url)
+    const data = await res.json()
 
-		if (!error && response.statusCode == 200) {
+    const entries = data.feed.entry;
+    const links = data.feed.link;
 
-      var data = JSON.parse(body);
-			var entry = data.feed.entry;
-			var links = data.feed.link;
+    if (entries && links) {
 
-			if (entry && links) {
+      var reviews = [];
+      entries.forEach((entry) => {
+        if ('content' in entry) {
+          reviews.push(formatReview(entry));
+        }
+      });
 
-        var reviews = [];
-        entry.forEach(function(e) {
-          if ('content' in e) {
-              reviews.push(formatReview(e));
-          }
-        });
-
-        deferred.resolve(reviews);
-      } else {
-        deferred.reject('Application not found');
-      }
-
+      return reviews;
     } else {
-      if (error === null) {
-        error = new Error('HTTP response ' + response.statusCode);
-      }
-      deferred.reject(error);
+      return new Error('Application not found');
     }
 
-  });
-
-  return deferred.promise;
+  } catch (error) {
+    console.log(error)
+    return new Error('HTTP response error'); // + response.statusCode
+  }
 
 }
 
-function getAppInfo(appId) {
-
-  var deferred = Q.defer();
-
-  storeScraper.app({id: appId})
-  .then(function(app) {
-    deferred.resolve(formatAppInfo(app));
-  }).catch(function(err) {
-    deferred.reject(new Error(err));
-  });
-
-  return deferred.promise;
+const getAppInfo = async appId => {
+  try {
+    const app = await storeScraper.app({ id: appId })
+    return formatAppInfo(app)
+  } catch (error) {
+    return new Error(error)
+  }
 }
 
-function formatReview(rawReview) {
+const formatReview = rawReview => {
   return {
     id: rawReview.id.label,
     author: rawReview.author.name.label,
@@ -68,7 +53,7 @@ function formatReview(rawReview) {
   };
 }
 
-function formatAppInfo(rawAppInfo) {
+const formatAppInfo = rawAppInfo => {
   return {
     id: rawAppInfo.id,
     title: rawAppInfo.title,
@@ -78,12 +63,6 @@ function formatAppInfo(rawAppInfo) {
 }
 
 module.exports = {
-
-  getReviews: function(appId, country) {
-    return getReviews(appId, country, 1);
-  },
-
-  getAppInfo: function(appId) {
-    return getAppInfo(appId);
-  }
+  getReviews: getReviews,
+  getAppInfo: getAppInfo
 };

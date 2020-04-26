@@ -1,20 +1,26 @@
 <script type="text/javascript">
-    RED.nodes.registerType('googleplay',{
-        category: 'input',
-        color: '#a1d490',
-        icon: 'googleplay.png',
-        defaults: {
-            name: {value: ""},
-            appid: {value: "", required: true, type: 'string'},
-            language: {value: "", required: true, validate: RED.validators.regex(/^[a-z]{2}$/)},
-            pollinginterval: {value: 30, required: true}
-        },
-        inputs:0,
-        outputs:1,
-        label: function() {
-            return this.name||'googleplay (' + this.appid + ' - ' + this.language + ')';
-        }
-    });
+  RED.nodes.registerType('googleplay', {
+    category: 'input',
+    color: '#a1d490',
+    icon: 'googleplay.png',
+    defaults: {
+      name: { value: '' },
+      appid: { value: '', required: true, type: 'string' },
+      language: {
+        value: '',
+        required: true,
+        validate: RED.validators.regex(/^[a-z]{2}$/),
+      },
+      pollinginterval: { value: 30, required: true },
+    },
+    inputs: 0,
+    outputs: 1,
+    label: function () {
+      return (
+        this.name || 'googleplay (' + this.appid + ' - ' + this.language + ')'
+      );
+    },
+  });
 </script>
 
 <script type="text/x-red" data-template-name="googleplay">
@@ -45,20 +51,19 @@
     <label for="node-input-name"><i class="icon-tag"></i> <span data-i18n="googleplay.label.name"></span></label>
     <input type="text" id="node-input-name">
   </div>
-
 </script>
 
 <script type="text/x-red" data-help-name="googleplay">
-    <p>A node for collecting Google Play reviews.</p>
-    <p>Sends a new message for each new review found for a given App in a given language.</p>
-    <p>Review data is stored in <code>msg.review</code>.</p>
-    <p>Content of <code>msg.review</code> is:</p>
-    <ul>
-      <li><code>msg.review.id</code>: review identifier</li>
-      <li><code>msg.review.appInfo</code>: application information. Object containing <code>id</code>, <code>title</code>, <code>icon</code> and <code>url</code></li>
-      <li><code>msg.review.rating</code>: review rating</li>
-      <li><code>msg.review.author</code>: review author</li>
-      <li><code>msg.review.title</code>: review title</li>
-      <li><code>msg.review.comment</code>: review comment</li>
-    </ul>
+  <p>A node for collecting Google Play reviews.</p>
+  <p>Sends a new message for each new review found for a given App in a given language.</p>
+  <p>Review data is stored in <code>msg.review</code>.</p>
+  <p>Content of <code>msg.review</code> is:</p>
+  <ul>
+    <li><code>msg.review.id</code>: review identifier</li>
+    <li><code>msg.review.appInfo</code>: application information. Object containing <code>id</code>, <code>title</code>, <code>icon</code> and <code>url</code></li>
+    <li><code>msg.review.rating</code>: review rating</li>
+    <li><code>msg.review.author</code>: review author</li>
+    <li><code>msg.review.title</code>: review title</li>
+    <li><code>msg.review.comment</code>: review comment</li>
+  </ul>
 </script>
