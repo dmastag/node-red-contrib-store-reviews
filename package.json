@@ -26,10 +26,7 @@
   "license": "ISC",
   "dependencies": {
     "app-store-scraper": "0.16.2",
-    "google-play-scraper": "7.1.2",
-    "node-fetch": "2.6.0",
-    "q": "^1.4.1",
-    "request": "^2.74.0"
+    "google-play-scraper": "7.1.2"
   },
   "devDependencies": {
     "mocha": "^3.0.0",
