@@ -1,27 +1,19 @@
 "user strict";
-const fetch = require('node-fetch');
 const storeScraper = require('app-store-scraper');
 
 const getReviews = async (appId, country, page = 1) => {
 
-  var url = 'http://itunes.apple.com/rss/customerreviews/page=' + page + '/id=' + appId + '/sortby=mostrecent/json?cc=' + country;
-
   try {
-    const res = await fetch(url)
-    const data = await res.json()
+    const entries = await storeScraper.reviews({
+      id: appId,
+      country: country,
+      sort: storeScraper.sort.RECENT,
+      page: page
+    })
 
-    const entries = data.feed.entry;
-    const links = data.feed.link;
-
-    if (entries && links) {
-
-      var reviews = [];
-      entries.forEach((entry) => {
-        if ('content' in entry) {
-          reviews.push(formatReview(entry));
-        }
-      });
-
+    if (entries) {
+      let reviews = [];
+      entries.forEach(entry => reviews.push(formatReview(entry)));
       return reviews;
     } else {
       return new Error('Application not found');
@@ -45,11 +37,11 @@ const getAppInfo = async appId => {
 
 const formatReview = rawReview => {
   return {
-    id: rawReview.id.label,
-    author: rawReview.author.name.label,
-    rating: rawReview['im:rating'].label,
-    title: rawReview.title.label,
-    comment: rawReview.content.label
+    id: rawReview.id,
+    author: rawReview.userName,
+    rating: rawReview.score,
+    title: rawReview.title,
+    comment: rawReview.text
   };
 }
 
