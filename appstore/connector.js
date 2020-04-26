@@ -41,7 +41,8 @@ const formatReview = rawReview => {
     author: rawReview.userName,
     rating: rawReview.score,
     title: rawReview.title,
-    comment: rawReview.text
+    comment: rawReview.text,
+    version: rawReview.version
   };
 }
 
