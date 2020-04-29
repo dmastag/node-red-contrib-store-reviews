@@ -19,19 +19,20 @@ module.exports = function (RED) {
     const node = this;
 
     // Instantiate detector for each application
-    node.appids.forEach(app => {
-      node.log('Registering app ' + app);
+    node.appids.forEach(appId => {
+      node.log(`Registering app ${appId}.${node.country}`);
     });
 
     // Start polling
     poller.start(() => {
       // Detect new reviews for each application
-      node.appids.forEach(async app => {
+      node.appids.forEach(async appId => {
+        const app = `${appId}.${node.country}`
         let appContext = context.get(app);
 
         if (!appContext) {
           appContext = {
-            "appId": app,
+            "appId": appId,
             "language": node.language,
             "appInfo": null,
             "latestReviewId": null
@@ -43,7 +44,7 @@ module.exports = function (RED) {
 
         try {
 
-          const returnDetector = await detector.detect(app, node.language, connector, appContext.latestReviewId);
+          const returnDetector = await detector.detect(appId, node.language, connector, appContext.latestReviewId);
           node.log(`${returnDetector.newReviews.length} new reviews found for app ${app} and last review ID ${returnDetector.latestReviewId}`);
 
           // Send new reviews
