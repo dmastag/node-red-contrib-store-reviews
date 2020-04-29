@@ -14,7 +14,7 @@ const getReviews = async (appId, country, page = 1) => {
 
     let formattedReviews = []
     reviews.forEach(review => {
-      formattedReviews.push(formatReview(review));
+      formattedReviews.push(formatReview(review, country));
     });
 
     return formattedReviews
@@ -35,7 +35,7 @@ const getAppInfo = async appId => {
   }
 }
 
-const formatReview = rawReview => {
+const formatReview = (rawReview, country) => {
   const id = url.parse(rawReview.url, true).query.reviewId;
   return {
     id: id,
@@ -43,7 +43,8 @@ const formatReview = rawReview => {
     rating: rawReview.score,
     title: rawReview.title,
     comment: rawReview.text,
-    version: rawReview.version
+    version: rawReview.version,
+    country: country
   };
 }
 

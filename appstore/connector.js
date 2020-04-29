@@ -13,7 +13,7 @@ const getReviews = async (appId, country, page = 1) => {
 
     if (entries) {
       let reviews = [];
-      entries.forEach(entry => reviews.push(formatReview(entry)));
+      entries.forEach(entry => reviews.push(formatReview(entry, country)));
       return reviews;
     } else {
       return new Error('Application not found');
@@ -35,14 +35,15 @@ const getAppInfo = async appId => {
   }
 }
 
-const formatReview = rawReview => {
+const formatReview = (rawReview, country) => {
   return {
     id: rawReview.id,
     author: rawReview.userName,
     rating: rawReview.score,
     title: rawReview.title,
     comment: rawReview.text,
-    version: rawReview.version
+    version: rawReview.version,
+    country: country
   };
 }
 
