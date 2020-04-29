@@ -20,14 +20,14 @@ module.exports = function (RED) {
 
     // Instantiate detector for each application
     node.appids.forEach(appId => {
-      node.log(`Registering app ${appId}.${node.country}`);
+      node.log(`Registering app ${appId}.${node.language}`);
     });
 
     // Start polling
     poller.start(() => {
       // Detect new reviews for each application
       node.appids.forEach(async appId => {
-        const app = `${appId}.${node.country}`
+        const app = `${appId}.${node.language}`
         let appContext = context.get(app);
 
         if (!appContext) {
